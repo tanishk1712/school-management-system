@@ -280,51 +280,51 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { schoolName, password } = req.body;
-    
+    const { email, password } = req.body;
+
     // Validate input
-    if (!schoolName || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-    
-    // Find school
-    const school = await School.findOne({ schoolName });
-    
+
+    // Find school by email
+    const school = await School.findOne({ schoolEmail: email });
+
     if (!school) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    
+
     // Verify password
     const isMatch = await bcrypt.compare(password, school.password);
-    
+
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    
+
     // Generate JWT token
     const token = jwt.sign(
-      { id: school._id, schoolName: school.schoolName },
+      { id: school._id, schoolEmail: school.schoolEmail },
       JWT_SECRET,
       { expiresIn: '1d' }
     );
-    
+
     // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-    
+
     // Send response without password
-    const schoolData = school.toObject();
-    delete schoolData.password;
-    
+    const { password: _, ...schoolData } = school.toObject();
+
     res.json(schoolData);
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('token');
@@ -1052,6 +1052,74 @@ app.delete('/api/announcements/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+//Forgot Password
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  const user = await School.findOne({ 
+    $or: [
+      { schoolEmail: email }
+    ]
+  });
+  // const school = await School.findOne({ schoolName });
+
+
+  if (!user) {
+    return res.status(404).json({ message: 'No user found with this email' });
+  }
+
+  // Generate a reset token (e.g., JWT or random string)
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+  // Optionally, save the token in the DB if using random strings
+
+  // Send email with reset link
+  const resetLink = `http://localhost:5173/reset-password/${token}`; // frontend page
+
+  const mailOptions = {
+    from: 'support@gmail.com',
+    to: email,
+    subject: 'Password Reset Request',
+    text: `Hi ${user.name},\n\nYou requested to reset your password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link will expire in 15 minutes.\n\nIf you didn't request this, please ignore this email.`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Password reset link sent to email' });
+  } catch (error) {
+    console.error('Email send failed:', error);
+    res.status(500).json({ message: 'Failed to send email' });
+  }
+});
+
+// POST /api/auth/reset-password
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await School.findById(decoded.id);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // You should hash the password before saving (use bcrypt)
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+    res.status(200).json({ message: 'Password has been reset successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Invalid or expired token' });
+  }
+});
+
+
 
 // Start server
 // app.listen(PORT, () => {

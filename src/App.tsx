@@ -18,6 +18,8 @@ import Exams from './pages/dashboard/Exams';
 import Timetables from './pages/dashboard/Timetables';
 import Settings from './pages/dashboard/Settings';
 import Chat from './pages/dashboard/Chat';
+import ResetPassword from './pages/auth/ResetPassword';
+import LandingPage from './pages/LandingPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -61,10 +63,12 @@ function App() {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path="/landing-page" element={<LandingPage />} />
       <Route path="/" element={<PublicRoute><AuthLayout /></PublicRoute>}>
         <Route index element={<Navigate to="/login" />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="reset-password/:token" element={<ResetPassword />} />
       </Route>
       
       {/* Protected Routes */}
