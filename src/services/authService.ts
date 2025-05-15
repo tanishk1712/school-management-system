@@ -21,7 +21,7 @@ const handleResponse = async (response: Response) => {
 };
 
 // Login service
-export const apiLogin = async (schoolName: string, password: string): Promise<User> => {
+export const apiLogin = async (email: string, password: string): Promise<User> => {
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -29,7 +29,7 @@ export const apiLogin = async (schoolName: string, password: string): Promise<Us
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({ schoolName, password }),
+      body: JSON.stringify({ email, password }),
       credentials: 'include',
     });
 

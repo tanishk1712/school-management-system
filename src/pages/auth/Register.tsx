@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -50,7 +51,7 @@ const Register = () => {
 
 
   const handleViewPassword = () => {
-    setViewPassword(prev => !prev);
+    setViewPassword((prev: any) => !prev);
   };
   
 
@@ -119,22 +120,22 @@ const Register = () => {
             Password
           </label>
           <div className="mt-1 relative">
-  <input
-    id="password"
-    name="password"
-    type={viewPassword ? "text" : "password"}
-    autoComplete="new-password"
-    required
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-    className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-    disabled={isSubmitting}
-  />
-  <Eye
-    className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-    onClick={handleViewPassword}
-  />
-</div>
+            <input
+              id="password"
+              name="password"
+              type={viewPassword ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              disabled={isSubmitting}
+            />
+            <Eye
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+              onClick={handleViewPassword}
+            />
+          </div>
 
         </div>
 
