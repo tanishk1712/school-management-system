@@ -6,6 +6,15 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'karodiyatanish@gmail.com',
+    pass: 'zukc mlqd lucx yxua' // Use app password if 2FA is enabled
+  }
+});
 
 // Load environment variables
 dotenv.config();
@@ -378,11 +387,28 @@ app.post('/api/teachers', authenticateToken, async (req, res) => {
       `New teacher added: ${name} (${subject})`
     );
 
+    const mailOptions = {
+      from: 'support@gmail.com',
+      to: email,
+      subject: 'Welcome to Our School!',
+      text: `Dear ${name},\n\nYou have been successfully added as a teacher for ${subject}.\n\nWelcome aboard!\n\nBest Regards,\nSchool Team`
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('Error sending email:', err);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
     res.status(201).json(savedTeacher);
+
   } catch (error) {
     console.error('Create teacher error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+
 });
 
 app.put('/api/teachers/:id', authenticateToken, async (req, res) => {
@@ -437,7 +463,7 @@ app.delete('/api/teachers/:id', authenticateToken, async (req, res) => {
     await createActivity(
       schoolId,
       ACTIVITY_TYPES.TEACHER_DELETED,
-      `${name} profile was deleted.`
+      // `${name} profile was deleted.`
     );
     
     res.json({ message: 'Teacher deleted successfully' });
@@ -493,6 +519,22 @@ app.post('/api/students', authenticateToken, async (req, res) => {
       ACTIVITY_TYPES.STUDENT_CREATED,
       `${name} has been added to (${studentClass}`
     );
+    
+
+    const mailOptions = {
+      from: 'support@gmail.com',
+      to: email,
+      subject: 'Formal Warning Regarding Lack of Focus and Work Performance',
+      text: `Dear ${name},\n\nYou have been successfully added as a student for ${studentClass} class (section ${section}).\n\nWelcome aboard!\n\nBest Regards,\nSchool Team`
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('Error sending email:', err);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
 
     res.status(201).json(savedStudent);
   } catch (error) {

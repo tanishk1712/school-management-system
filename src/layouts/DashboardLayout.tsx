@@ -9,7 +9,8 @@ import {
   Settings, 
   Menu, 
   X, 
-  LogOut 
+  LogOut, 
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
@@ -31,6 +32,7 @@ const DashboardLayout = () => {
     { name: 'Students', href: '/students', icon: UserRound },
     { name: 'Exams', href: '/exams', icon: CalendarCheck },
     { name: 'Timetables', href: '/timetables', icon: Clock },
+    { name: 'Chat', href: '/chat', icon: MessageSquare },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
@@ -179,7 +181,7 @@ const DashboardLayout = () => {
         
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
           <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8">
               <Outlet />
             </div>
           </div>

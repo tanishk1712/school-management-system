@@ -17,6 +17,7 @@ import Students from './pages/dashboard/Students';
 import Exams from './pages/dashboard/Exams';
 import Timetables from './pages/dashboard/Timetables';
 import Settings from './pages/dashboard/Settings';
+import Chat from './pages/dashboard/Chat';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -74,6 +75,7 @@ function App() {
         <Route path="exams" element={<Exams />} />
         <Route path="timetables" element={<Timetables />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="chat" element={<Chat />} />
       </Route>
       
       {/* Catch-all route */}
