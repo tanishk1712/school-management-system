@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import feeRoutes from './routes/feeRoutes.js';
+import salaryRoutes from './routes/salaryRoutes.js';
 
 // Load env vars
 dotenv.config();
@@ -23,6 +25,8 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/fees', feeRoutes);
+app.use('/api/salaries', salaryRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
