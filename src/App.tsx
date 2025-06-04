@@ -20,11 +20,13 @@ import Settings from './pages/dashboard/Settings';
 import Chat from './pages/dashboard/Chat';
 import ResetPassword from './pages/auth/ResetPassword';
 import LandingPage from './pages/LandingPage';
+import SchoolFee from './pages/dashboard/SchoolFeeUI';
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -32,18 +34,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
+
   if (!user) {
     return <Navigate to="/login" />;
   }
-  
+
   return <>{children}</>;
 };
 
 // Public Route Component (accessible only when not logged in)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -51,11 +53,11 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  
+
   if (user) {
     return <Navigate to="/dashboard" />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -70,7 +72,7 @@ function App() {
         <Route path="register" element={<Register />} />
         <Route path="reset-password/:token" element={<ResetPassword />} />
       </Route>
-      
+
       {/* Protected Routes */}
       <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="dashboard" element={<Dashboard />} />
@@ -80,8 +82,10 @@ function App() {
         <Route path="timetables" element={<Timetables />} />
         <Route path="settings" element={<Settings />} />
         <Route path="chat" element={<Chat />} />
+        <Route path="fees" element={<SchoolFee />} />
+
       </Route>
-      
+
       {/* Catch-all route */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

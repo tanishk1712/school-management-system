@@ -11,6 +11,7 @@ import examRoutes from './routes/exams.js';
 import timetableRoutes from './routes/timetables.js';
 import activityRoutes from './routes/activities.js';
 import announcementRoutes from './routes/announcements.js';
+import feeRoutes from './routes/feeRoutes.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use('/api/exams', examRoutes);
 app.use('/api/timetables', timetableRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/fees', feeRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

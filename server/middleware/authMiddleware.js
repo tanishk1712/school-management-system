@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 import School from '../models/School.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const protect = async (req, res, next) => {
   let token;

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  UserRound, 
-  CalendarCheck, 
-  Clock, 
-  Settings, 
-  Menu, 
-  X, 
-  LogOut, 
-  MessageSquare
+import {
+  LayoutDashboard,
+  Users,
+  UserRound,
+  CalendarCheck,
+  Clock,
+  Settings,
+  Menu,
+  X,
+  LogOut,
+  MessageSquare,
+  ReceiptIndianRupee
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
@@ -33,6 +34,7 @@ const DashboardLayout = () => {
     { name: 'Exams', href: '/exams', icon: CalendarCheck },
     { name: 'Timetables', href: '/timetables', icon: Clock },
     { name: 'Chat', href: '/chat', icon: MessageSquare },
+    { name: 'Fees', href: '/fees', icon: ReceiptIndianRupee },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
@@ -44,9 +46,9 @@ const DashboardLayout = () => {
         sidebarOpen ? "block" : "hidden"
       )}>
         {/* Background overlay */}
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
-          onClick={() => setSidebarOpen(false)} 
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity"
+          onClick={() => setSidebarOpen(false)}
         />
 
         {/* Sidebar */}
@@ -68,7 +70,7 @@ const DashboardLayout = () => {
               {user?.schoolName || 'School Management'}
             </span>
           </div>
-          
+
           {/* Navigation */}
           <div className="mt-5 flex-1 h-0 overflow-y-auto">
             <nav className="px-2 space-y-1">
@@ -123,7 +125,7 @@ const DashboardLayout = () => {
               </div>
 
               <div className='w-full h-[1px] bg-[#bdbdbdc0]'></div>
-              
+
               {/* Navigation */}
               <nav className="mt-5 flex-1 px-2 py-4 space-y-1">
                 {navigation.map((item) => (
@@ -145,7 +147,7 @@ const DashboardLayout = () => {
             </div>
             <div className='w-full h-[1px] bg-[#bdbdbdc0]'></div>
 
-            
+
             {/* Logout button - Desktop */}
             <div className="flex-shrink-0 flex p-4">
               <button
@@ -165,7 +167,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Main content */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
@@ -178,7 +180,7 @@ const DashboardLayout = () => {
             <Menu className="h-6 w-6" />
           </button>
         </div>
-        
+
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
           <div className="py-6">
             <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8">
