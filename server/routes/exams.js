@@ -6,7 +6,7 @@ import { ACTIVITY_TYPES } from '../utils/activityTypes.js';
 
 const router = express.Router();
 
-router.get('/api/exams', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const exams = await Exam.find({ schoolId });
@@ -17,7 +17,7 @@ router.get('/api/exams', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/api/exams', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const {
@@ -59,7 +59,7 @@ router.post('/api/exams', authenticateToken, async (req, res) => {
     }
 });
 
-router.put('/api/exams/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const examId = req.params.id;
@@ -101,7 +101,7 @@ router.put('/api/exams/:id', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/api/exams/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const examId = req.params.id;

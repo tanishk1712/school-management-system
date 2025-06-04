@@ -7,7 +7,7 @@ import { sendWelcomeEmail } from '../config/email.js';
 
 const router = express.Router();
 
-router.get('/api/teachers', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const teachers = await Teacher.find({ schoolId });
@@ -18,7 +18,7 @@ router.get('/api/teachers', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/api/teachers', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const { name, email, phone, subject, qualification, joinDate } = req.body;
@@ -64,7 +64,7 @@ router.post('/api/teachers', authenticateToken, async (req, res) => {
     }
 });
 
-router.put('/api/teachers/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const teacherId = req.params.id;
@@ -101,7 +101,7 @@ router.put('/api/teachers/:id', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/api/teachers/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const teacherId = req.params.id;

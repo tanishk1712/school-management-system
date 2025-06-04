@@ -5,7 +5,7 @@ import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.get('/api/activities', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         // Convert string ID to MongoDB ObjectId if needed

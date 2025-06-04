@@ -8,7 +8,7 @@ import { ACTIVITY_TYPES } from '../utils/activityTypes.js';
 
 const router = express.Router();
 
-router.get('/api/announcements', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         // Convert string ID to MongoDB ObjectId if needed
@@ -27,7 +27,7 @@ router.get('/api/announcements', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/api/announcements', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const { title, content, type = 'INFO' } = req.body;
@@ -65,7 +65,7 @@ router.post('/api/announcements', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/api/announcements/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const announcementId = req.params.id;

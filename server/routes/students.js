@@ -7,7 +7,7 @@ import { sendWelcomeEmail } from '../config/email.js';
 
 const router = express.Router();
 
-router.get('/api/students', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const students = await Student.find({ schoolId });
@@ -18,7 +18,7 @@ router.get('/api/students', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/api/students', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const {
@@ -76,7 +76,7 @@ router.post('/api/students', authenticateToken, async (req, res) => {
     }
 });
 
-router.put('/api/students/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const studentId = req.params.id;
@@ -119,7 +119,7 @@ router.put('/api/students/:id', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/api/students/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const studentId = req.params.id;

@@ -7,8 +7,7 @@ import { ACTIVITY_TYPES } from '../utils/activityTypes.js';
 
 const router = express.Router();
 
-// Timetable Routes
-router.get('/api/timetables', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const timetables = await Timetable.find({ schoolId });
@@ -19,7 +18,7 @@ router.get('/api/timetables', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/api/timetables', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const { name, class: timetableClass, section, effectiveFrom } = req.body;
@@ -54,7 +53,7 @@ router.post('/api/timetables', authenticateToken, async (req, res) => {
     }
 });
 
-router.put('/api/timetables/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const timetableId = req.params.id;
@@ -89,7 +88,7 @@ router.put('/api/timetables/:id', authenticateToken, async (req, res) => {
     }
 });
 
-router.delete('/api/timetables/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const timetableId = req.params.id;
@@ -122,7 +121,7 @@ router.delete('/api/timetables/:id', authenticateToken, async (req, res) => {
 });
 
 // Timetable entries
-router.get('/api/timetables/:id/entries', authenticateToken, async (req, res) => {
+router.get('/:id/entries', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const timetableId = req.params.id;
@@ -141,7 +140,7 @@ router.get('/api/timetables/:id/entries', authenticateToken, async (req, res) =>
     }
 });
 
-router.post('/api/timetables/:id/entries', authenticateToken, async (req, res) => {
+router.post('/:id/entries', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const timetableId = req.params.id;
@@ -194,7 +193,7 @@ router.post('/api/timetables/:id/entries', authenticateToken, async (req, res) =
     }
 });
 
-router.delete('/api/timetables/:timetableId/entries/:entryId', authenticateToken, async (req, res) => {
+router.delete('/:timetableId/entries/:entryId', authenticateToken, async (req, res) => {
     try {
         const schoolId = req.user.id;
         const { timetableId, entryId } = req.params;
