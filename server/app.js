@@ -24,7 +24,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
+// Routes - Remove /api prefix from here since it's in the route files
 app.use('/api/auth', authRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/students', studentRoutes);
@@ -34,7 +34,7 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/announcements', announcementRoutes);
 
 // Health check route
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });
 
@@ -44,11 +44,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-    console.log(`Unmatched route: ${req.method} ${req.originalUrl}`);
+// 404 handler - This should be the last middleware
+app.use((req, res) => {
+    console.log(`Route not found: ${req.method} ${req.originalUrl}`);
     res.status(404).json({ message: 'Route not found' });
 });
-
 
 export default app;
