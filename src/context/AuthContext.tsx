@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useState, useEffect } from 'react';
 import { apiLogin, apiRegister, apiLogout, apiCheckAuth } from '../services/authService';
 
@@ -20,9 +21,9 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
-  login: async () => {},
-  register: async () => {},
-  logout: async () => {},
+  login: async () => { },
+  register: async () => { },
+  logout: async () => { },
   error: null,
 });
 
@@ -42,14 +43,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
       }
     };
-    
+
     checkAuthStatus();
   }, []);
 
   const login = async (schoolName: string, password: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const userData = await apiLogin(schoolName, password);
       setUser(userData);
@@ -66,14 +67,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const register = async (
-    adminName: string, 
-    schoolName: string, 
-    schoolEmail: string, 
+    adminName: string,
+    schoolName: string,
+    schoolEmail: string,
     password: string
   ) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const userData = await apiRegister(adminName, schoolName, schoolEmail, password);
       setUser(userData);
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       await apiLogout();
       setUser(null);

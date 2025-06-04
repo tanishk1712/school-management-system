@@ -5,23 +5,23 @@ const API_URL = 'http://localhost:5000/api';
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
   const contentType = response.headers.get('content-type');
-  
+
   if (!contentType || !contentType.includes('application/json')) {
     throw new Error('Invalid response format');
   }
-  
+
   const data = await response.json();
-  localStorage.setItem('School ID',data?.id)
-  
+  localStorage.setItem('School ID', data?.id)
+
   if (!response.ok) {
     throw new Error(data.message || 'An error occurred');
   }
-  
+
   return data;
 };
 
 // Login service
-export const apiLogin = async (email: string, password: string): Promise<User> => {
+export const apiLogin = async (schoolName: string, password: string): Promise<User> => {
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -29,7 +29,7 @@ export const apiLogin = async (email: string, password: string): Promise<User> =
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ schoolName, password }),
       credentials: 'include',
     });
 
