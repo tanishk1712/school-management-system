@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -10,7 +13,7 @@ export const transporter = nodemailer.createTransport({
 
 export const sendWelcomeEmail = async (email, name, role, additionalInfo = '') => {
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: 'support@gmail.com',
         to: email,
         subject: `Welcome to Our School! - ${role}`,
         text: `Dear ${name},\n\nYou have been successfully added as a ${role.toLowerCase()}${additionalInfo}.\n\nWelcome aboard!\n\nBest Regards,\nSchool Team`

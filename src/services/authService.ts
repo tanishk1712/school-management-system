@@ -11,7 +11,8 @@ const handleResponse = async (response: Response) => {
   }
 
   const data = await response.json();
-  localStorage.setItem('School ID', data?.id)
+  localStorage.setItem('School ID', data?._id)
+  console.log(data, 'kalaalakalsklakslaks')
 
   if (!response.ok) {
     throw new Error(data.message || 'An error occurred');
