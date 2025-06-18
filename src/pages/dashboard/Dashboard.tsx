@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Users, UserRound, CalendarCheck, Clock, FileText, Calendar, Bell, Info, AlertTriangle, AlertCircle, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { BASE_URL } from '../../services/authService';
 
 type CountData = {
   exams: number;
@@ -64,7 +65,7 @@ const Dashboard = () => {
 
   const recentActivities = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/activities', {
+      const response = await fetch(`${BASE_URL}/api/activities`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ const Dashboard = () => {
   const fetchAnnouncements = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/announcements', {
+      const response = await fetch(`${BASE_URL}/api/announcements`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ const Dashboard = () => {
         timestamp: new Date()
       };
 
-      const response = await fetch('http://localhost:5000/api/announcements', {
+      const response = await fetch(`${BASE_URL}/api/announcements`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ const Dashboard = () => {
       const savedAnnouncement = await response.json();
       setAnnouncements([...announcements, savedAnnouncement]);
       toast.success('Announcement added successfully');
-      
+
       // Reset form and close modal
       setNewAnnouncement({
         title: '',
@@ -153,7 +154,7 @@ const Dashboard = () => {
         type: 'INFO'
       });
       setShowAnnouncementModal(false);
-      
+
     } catch (error) {
       console.error('Error adding announcement:', error);
       toast.error('Failed to add announcement');
@@ -162,7 +163,7 @@ const Dashboard = () => {
   const handleDeleteAnnouncement = async (id: string) => {
     try {
       setIsDeleting(true);
-      const response = await fetch(`http://localhost:5000/api/announcements/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/announcements/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ const Dashboard = () => {
 
   const fetchExams = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/exams', {
+      const response = await fetch(`${BASE_URL}/api/exams`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +250,7 @@ const Dashboard = () => {
         ...prev,
         exams: data.length
       }));
-      
+
     } catch (error) {
       console.error('Error fetching exams:', error);
       toast.error('Failed to load exams');
@@ -258,7 +259,7 @@ const Dashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/students', {
+      const response = await fetch(`${BASE_URL}/api/students`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -284,7 +285,7 @@ const Dashboard = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/teachers', {
+      const response = await fetch(`${BASE_URL}/api/teachers`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +311,7 @@ const Dashboard = () => {
 
   const fetchTimetable = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/timetables', {
+      const response = await fetch(`${BASE_URL}/api/timetables`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -419,7 +420,7 @@ const Dashboard = () => {
           </div>
           <button className='border p-3 rounded-lg text-gray-500 hover:bg-[#152259] hover:text-gray-200'>Add Admin</button>
         </div>
-       <hr/>
+        <hr />
         <div className='flex justify-between p-8 items-center'>
           <div className='flex justify-start gap-6 items-start'>
             <div className='mt-[8px]'>
@@ -448,7 +449,7 @@ const Dashboard = () => {
           </div>
           <button className='border p-3 rounded-lg text-gray-500 hover:bg-[#152259] hover:text-gray-200'>Add Classes</button>
         </div>
-        <hr/>
+        <hr />
         <div className='flex justify-between p-8 items-center'>
           <div className='flex justify-start gap-6 items-start'>
             <div className='mt-[8px]'>
@@ -485,8 +486,8 @@ const Dashboard = () => {
           >
             <div className="p-5">
               <div className="flex items-center">
-                <div className={`flex-shrink-0 p-3 rounded-md ${card.bgColor}`}>
-                  <card.icon className={`h-6 w-6 ${card.iconColor}`} aria-hidden="true" />
+                <div className={`flex - shrink - 0 p - 3 rounded - md ${card.bgColor}`}>
+                  <card.icon className={`h - 6 w - 6 ${card.iconColor}`} aria-hidden="true" />
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
@@ -498,7 +499,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className={`bg-gray-50 px-5 py-3`}>
+            <div className={`bg - gray - 50 px - 5 py - 3`}>
               <div className="text-sm">
                 <div className="font-medium text-primary-600 hover:text-primary-700">
                   View all
@@ -517,9 +518,9 @@ const Dashboard = () => {
             <h3 className="text-lg font-medium leading-6 text-gray-900">Recent Activities</h3>
           </div>
           <div className="p-4 ">
-          <div className="space-y-4 max-h-96 overflow-auto">
+            <div className="space-y-4 max-h-96 overflow-auto">
               {activities.length > 0 ? (
-                activities.map((activity : any) => (
+                activities.map((activity: any) => (
                   <div key={activity._id} className="flex items-start">
                     <div className="flex-shrink-0">
                       <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
@@ -558,144 +559,144 @@ const Dashboard = () => {
 
         {/* Announcements */}
         <div className="bg-white shadow rounded-lg">
-      <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Announcements</h3>
-        <button 
-          onClick={() => setShowAnnouncementModal(true)}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-        >
-          <Bell className="h-4 w-4 mr-1" /> Add Announcement
-        </button>
-      </div>
-      
-      <div className="p-4">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">Announcements</h3>
+            <button
+              onClick={() => setShowAnnouncementModal(true)}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <Bell className="h-4 w-4 mr-1" /> Add Announcement
+            </button>
           </div>
-        ) : (
-          <div className="space-y-4 max-h-96 overflow-auto">
-            {announcements.length > 0 ? (
-              announcements.map((announcement : any) => {
-                const styles = getAnnouncementStyles(announcement.type);
-                return (
-                  <div key={announcement._id} className={`${styles.bg} ${styles.border} p-4 relative`}>
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        {getAnnouncementIcon(announcement.type)}
-                      </div>
-                      <div className="ml-3 flex-1 pr-8">
-                        <h3 className={`text-sm font-medium ${styles.textColor}`}>{announcement.title}</h3>
-                        <div className={`mt-2 text-sm ${styles.contentColor}`}>
-                          <p>{announcement.content}</p>
-                        </div>
-                        <p className="mt-1 text-xs text-gray-500">{formatDate(announcement.timestamp)}</p>
-                      </div>
-                      <button 
-                        onClick={() => handleDeleteAnnouncement(announcement._id)}
-                        disabled={isDeleting}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 focus:outline-none"
-                        title="Delete announcement"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
+
+          <div className="p-4">
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No announcements</p>
+              <div className="space-y-4 max-h-96 overflow-auto">
+                {announcements.length > 0 ? (
+                  announcements.map((announcement: any) => {
+                    const styles = getAnnouncementStyles(announcement.type);
+                    return (
+                      <div key={announcement._id} className={`${styles.bg} ${styles.border} p - 4 relative`}>
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            {getAnnouncementIcon(announcement.type)}
+                          </div>
+                          <div className="ml-3 flex-1 pr-8">
+                            <h3 className={`text - sm font - medium ${styles.textColor}`}>{announcement.title}</h3>
+                            <div className={`mt - 2 text - sm ${styles.contentColor}`}>
+                              <p>{announcement.content}</p>
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500">{formatDate(announcement.timestamp)}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteAnnouncement(announcement._id)}
+                            disabled={isDeleting}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 focus:outline-none"
+                            title="Delete announcement"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No announcements</p>
+                )}
+              </div>
+            )}
+
+            {announcements.length > 5 && (
+              <div className="mt-6">
+                <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+                  View all announcements
+                </a>
+              </div>
             )}
           </div>
-        )}
-        
-        {announcements.length > 5 && (
-          <div className="mt-6">
-            <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-              View all announcements
-            </a>
-          </div>
-        )}
-      </div>
 
-      {/* Announcement Modal */}
-      {showAnnouncementModal && (
-        <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
+          {/* Announcement Modal */}
+          {showAnnouncementModal && (
+            <div className="fixed inset-0 z-10 overflow-y-auto">
+              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                  <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <form onSubmit={handleAddAnnouncement}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Add New Announcement</h3>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input
-                      type="text"
-                      id="title"
-                      className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      value={newAnnouncement.title}
-                      onChange={(e) => setNewAnnouncement({...newAnnouncement, title: e.target.value})}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                    <textarea
-                      id="content"
-                      rows={4}
-                      className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      value={newAnnouncement.content}
-                      onChange={(e) => setNewAnnouncement({...newAnnouncement, content: e.target.value})}
-                      required
-                    ></textarea>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select
-                      id="type"
-                      className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      value={newAnnouncement.type}
-                      onChange={(e) => setNewAnnouncement({
-                        ...newAnnouncement, 
-                        type: e.target.value as 'INFO' | 'WARNING' | 'URGENT'
-                      })}
-                    >
-                      <option value="INFO">Info</option>
-                      <option value="WARNING">Warning</option>
-                      <option value="URGENT">Urgent</option>
-                    </select>
-                  </div>
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                  <form onSubmit={handleAddAnnouncement}>
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                      <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Add New Announcement</h3>
+
+                      <div className="mb-4">
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input
+                          type="text"
+                          id="title"
+                          className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          value={newAnnouncement.title}
+                          onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                        <textarea
+                          id="content"
+                          rows={4}
+                          className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          value={newAnnouncement.content}
+                          onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
+                          required
+                        ></textarea>
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <select
+                          id="type"
+                          className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          value={newAnnouncement.type}
+                          onChange={(e) => setNewAnnouncement({
+                            ...newAnnouncement,
+                            type: e.target.value as 'INFO' | 'WARNING' | 'URGENT'
+                          })}
+                        >
+                          <option value="INFO">Info</option>
+                          <option value="WARNING">Warning</option>
+                          <option value="URGENT">Urgent</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                      <button
+                        type="submit"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onClick={() => setShowAnnouncementModal(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 </div>
-                
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    Add
-                  </button>
-                  <button
-                    type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    onClick={() => setShowAnnouncementModal(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
-    </div>
       </div>
     </div>
   );

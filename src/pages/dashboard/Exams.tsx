@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
 import Nodata from './Nodata'
+import { BASE_URL } from '../../services/authService';
 
 // Type for exam
 interface Exam {
@@ -90,7 +91,7 @@ const Exams = () => {
   const fetchExams = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:5000/api/exams', {
+      const response = await fetch(`${BASE_URL}/api/exams`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -190,7 +191,7 @@ const Exams = () => {
       if (editingExam) {
         // Update existing exam
         const examId = getExamId(editingExam);
-        const response = await fetch(`http://localhost:5000/api/exams/${examId}`, {
+        const response = await fetch(`${BASE_URL}/api/exams/${examId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -247,7 +248,7 @@ const Exams = () => {
   const deleteExam = async (id: string) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:5000/api/exams/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/exams/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

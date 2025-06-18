@@ -13,6 +13,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import Nodata from './Nodata';
+import { BASE_URL } from '../../services/authService';
 
 // Available classes and sections
 const availableClasses = ['8', '9', '10', '11', '12'];
@@ -88,7 +89,7 @@ interface Timetable {
 }
 
 interface TimetableEntry {
-  _id:string
+  _id: string
   day: string;
   slotId: string;
   subject: string;
@@ -133,7 +134,7 @@ const Timetables = () => {
   useEffect(() => {
     const fetchTimetable = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/timetables', {
+        const response = await fetch(`${BASE_URL}/api/timetables`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -159,61 +160,61 @@ const Timetables = () => {
   useEffect(() => {
     const fetchEntries = async () => {
       if (!selectedTimetable?._id) return;
-  
+
       try {
-        const response = await fetch(`http://localhost:5000/api/timetables/${selectedTimetable._id}/entries`, {
+        const response = await fetch(`${BASE_URL}/api/timetables/${selectedTimetable._id}/entries`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${schoolID}` // Replace as needed
           },
-        credentials: 'include',
+          credentials: 'include',
         });
-  
+
         const data = await response.json();
-  
+
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch timetable entries');
         }
-  
+
         setTimetableDetails(prev => ({
           ...prev,
           [selectedTimetable.id]: data
         }));
       } catch (error) {
-         console.error('Failed to fetch Entries', error);
-              toast.error('Failed to fetch Entries');
+        console.error('Failed to fetch Entries', error);
+        toast.error('Failed to fetch Entries');
       }
     };
-  
+
     fetchEntries();
   }, [schoolID, selectedTimetable]);
 
   useEffect(() => {
-      const fetchTeachers = async () => {
-        try {
-          const response = await fetch('http://localhost:5000/api/teachers', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${schoolID}`,
-            },
-            credentials: 'include',
-          });
-    
-          if (!response.ok) {
-            throw new Error('Failed to fetch teachers');
-          }
-    
-          const data = await response.json();
-          setTeacherName(data.map((cata:any)=>cata?.name))
-        } catch (error) {
-          console.error('Error fetching teachers:', error);
+    const fetchTeachers = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/teachers`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${schoolID}`,
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch teachers');
         }
-      };
-    
-      fetchTeachers();
-    }, [schoolID]);
-  
+
+        const data = await response.json();
+        setTeacherName(data.map((cata: any) => cata?.name))
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      }
+    };
+
+    fetchTeachers();
+  }, [schoolID]);
+
 
   // Filter timetables based on search term and filters
   const filteredTimetables = timetables.filter(
@@ -314,7 +315,7 @@ const Timetables = () => {
         createdAt: new Date().toISOString(),
       };
 
-      const response = await fetch(`http://localhost:5000/api/timetables/${editingTimetable._id}`, {
+      const response = await fetch(`${BASE_URL}/api/timetables/${editingTimetable._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -345,7 +346,7 @@ const Timetables = () => {
         createdAt: new Date().toISOString(),
       };
 
-      const response = await fetch('http://localhost:5000/api/timetables', {
+      const response = await fetch(`${BASE_URL}/api/timetables`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -368,32 +369,32 @@ const Timetables = () => {
 
   const addEntry = async () => {
     if (!selectedTimetable) return;
-  
+
     if (!newEntry.subject || !newEntry.teacher) {
       toast.error('Please select a subject and teacher');
       return;
     }
-  
+
     // Check if the slot is already occupied locally
     const isOccupied = timetableDetails[selectedTimetable.id]?.some(
       entry => entry.day === newEntry.day && entry.slotId === newEntry.slotId
     );
-  
+
     if (isOccupied) {
       toast.error('This time slot is already occupied. Please remove the existing entry first.');
       return;
     }
-  
+
     const entry = {
       day: newEntry.day || 'Monday',
       slotId: newEntry.slotId || '1',
       subject: newEntry.subject || '',
       teacher: newEntry.teacher || ''
     };
-  
+
     try {
-  
-      const response = await fetch(`http://localhost:5000/api/timetables/${selectedTimetable._id}/entries`, {
+
+      const response = await fetch(`${BASE_URL}/api/timetables/${selectedTimetable._id}/entries`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -402,86 +403,86 @@ const Timetables = () => {
         credentials: 'include',
         body: JSON.stringify(entry)
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to add entry');
       }
-  
+
       const savedEntry = await response.json();
-  
+
       // Update local state with the saved entry
       setTimetableDetails(prev => ({
         ...prev,
         [selectedTimetable.id]: [...(prev[selectedTimetable.id] || []), savedEntry]
       }));
-  
+
       setNewEntry({ day: 'Monday', slotId: '1', subject: '', teacher: '' });
       toast.success('Entry added to timetable');
     } catch (error) {
-          console.error(' error:', error);
-          toast.error('Failed to add entries');
-        }
+      console.error(' error:', error);
+      toast.error('Failed to add entries');
+    }
   };
-  
+
 
   // Remove an entry from the timetable
- // Remove an entry from the timetable
- const removeEntry = async (day: string, slotId: string) => {
-  if (!selectedTimetable) return;
+  // Remove an entry from the timetable
+  const removeEntry = async (day: string, slotId: string) => {
+    if (!selectedTimetable) return;
 
-  const currentEntries = timetableDetails[selectedTimetable.id] || [];
+    const currentEntries = timetableDetails[selectedTimetable.id] || [];
 
-  // Find the entry to delete (based on day and slotId)
-  const entryToDelete = currentEntries.find(
-    entry => entry.day === day && entry.slotId === slotId
-  );
-
-  if (!entryToDelete || !entryToDelete._id) {
-    toast.error('Entry not found or missing ID');
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      `http://localhost:5000/api/timetables/${selectedTimetable._id}/entries/${entryToDelete._id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${schoolID}`
-        },
-        credentials: 'include'
-      }
+    // Find the entry to delete (based on day and slotId)
+    const entryToDelete = currentEntries.find(
+      entry => entry.day === day && entry.slotId === slotId
     );
 
-    if (!response.ok) {
-      const result = await response.json();
-      throw new Error(result.message || 'Failed to delete entry');
+    if (!entryToDelete || !entryToDelete._id) {
+      toast.error('Entry not found or missing ID');
+      return;
     }
-    
-    const result = await response.json();
 
-    // Update local state
-    setTimetableDetails({
-      ...timetableDetails,
-      [selectedTimetable.id]: currentEntries.filter(
-        entry => entry._id !== entryToDelete._id
-      )
-    });
-    toast.success(result?.message)
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/timetables/${selectedTimetable._id}/entries/${entryToDelete._id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${schoolID}`
+          },
+          credentials: 'include'
+        }
+      );
 
-  } catch (error) {
-    toast.error("Failed to delete entry");
-    console.error('Delete error:', error);
-  }
-};
-  
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || 'Failed to delete entry');
+      }
+
+      const result = await response.json();
+
+      // Update local state
+      setTimetableDetails({
+        ...timetableDetails,
+        [selectedTimetable.id]: currentEntries.filter(
+          entry => entry._id !== entryToDelete._id
+        )
+      });
+      toast.success(result?.message)
+
+    } catch (error) {
+      toast.error("Failed to delete entry");
+      console.error('Delete error:', error);
+    }
+  };
+
 
   // Delete timetable
   const deleteTimetable = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/timetables/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/timetables/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -900,17 +901,17 @@ const Timetables = () => {
                         Day
                       </label>
                       <div className='font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start bg-white max-w-lg gap-2 p-2'>
-                      <select
-                        name="day"
-                        id="day"
-                        value={newEntry.day}
-                        onChange={handleEntryChange}
-                        className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
+                        <select
+                          name="day"
+                          id="day"
+                          value={newEntry.day}
+                          onChange={handleEntryChange}
+                          className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
                         >
-                        {days.map(day => (
-                          <option key={day} value={day}>{day}</option>
-                        ))}
-                      </select>
+                          {days.map(day => (
+                            <option key={day} value={day}>{day}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -919,20 +920,20 @@ const Timetables = () => {
                         Time Slot
                       </label>
                       <div className='font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start bg-white max-w-lg gap-2 p-2'>
-                      
-                      <select
-                        name="slotId"
-                        id="slotId"
-                        value={newEntry.slotId}
-                        onChange={handleEntryChange}
-                        className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
-                      >
-                        {timeSlots.map(slot => (
-                          <option key={slot.id} value={slot.id}>
-                            {slot.start} - {slot.end}
-                          </option>
-                        ))}
-                      </select>
+
+                        <select
+                          name="slotId"
+                          id="slotId"
+                          value={newEntry.slotId}
+                          onChange={handleEntryChange}
+                          className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
+                        >
+                          {timeSlots.map(slot => (
+                            <option key={slot.id} value={slot.id}>
+                              {slot.start} - {slot.end}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -942,39 +943,39 @@ const Timetables = () => {
                       </label>
                       <div className='font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start bg-white max-w-lg gap-2 p-2'>
 
-                      <select
-                        name="subject"
-                        id="subject"
-                        value={newEntry.subject}
-                        onChange={handleEntryChange}
-                        className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
-                      >
-                        <option value="">Select Subject</option>
-                        {availableSubjects.map(subject => (
-                          <option key={subject} value={subject}>{subject}</option>
-                        ))}
-                      </select>
+                        <select
+                          name="subject"
+                          id="subject"
+                          value={newEntry.subject}
+                          onChange={handleEntryChange}
+                          className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
+                        >
+                          <option value="">Select Subject</option>
+                          {availableSubjects.map(subject => (
+                            <option key={subject} value={subject}>{subject}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
                     <div>
                       <label htmlFor="subject" className="ml-1 mb-1 block text-sm font-medium text-gray-700">
-                      Teacher
+                        Teacher
                       </label>
                       <div className='font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start bg-white max-w-lg gap-2 p-2'>
 
-                      <select
-                        name="teacher"
-                        id="teacher"
-                        value={newEntry.teacher}
-                        onChange={handleEntryChange}
-                        className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
-                      >
-                        <option value="">Select Teacher</option>
-                        {teachersName.map(name => (
-                          <option value={name}>{name}</option>
-                        ))}
-                      </select>
+                        <select
+                          name="teacher"
+                          id="teacher"
+                          value={newEntry.teacher}
+                          onChange={handleEntryChange}
+                          className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
+                        >
+                          <option value="">Select Teacher</option>
+                          {teachersName.map(name => (
+                            <option value={name}>{name}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -982,17 +983,17 @@ const Timetables = () => {
                       <label htmlFor="teacher" className="ml-1 mb-1 block text-sm font-medium text-gray-700">
                         Teacher
                       </label>
-            <div className=" font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start  bg-white max-w-lg gap-2 p-2">
+                      <div className=" font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start  bg-white max-w-lg gap-2 p-2">
 
-                      <input
-                        type="text"
-                        name="teacher"
-                        id="teacher"
-                        value={newEntry.teacher}
-                        onChange={handleEntryChange}
-                        className="focus:ring-primary-500 focus:border-primary-500  w-full  sm:text-sm border-gray-300 rounded-md outline-none"
-                        placeholder="Teacher name"
-                      />
+                        <input
+                          type="text"
+                          name="teacher"
+                          id="teacher"
+                          value={newEntry.teacher}
+                          onChange={handleEntryChange}
+                          className="focus:ring-primary-500 focus:border-primary-500  w-full  sm:text-sm border-gray-300 rounded-md outline-none"
+                          placeholder="Teacher name"
+                        />
                       </div>
                     </div>
 
@@ -1001,7 +1002,7 @@ const Timetables = () => {
                         type="button"
                         onClick={addEntry}
                         className="border p-2 rounded-lg text-[#152259] hover:bg-[#152259] hover:text-gray-200"
-                        >
+                      >
                         Add to Timetable
                       </button>
                     </div>

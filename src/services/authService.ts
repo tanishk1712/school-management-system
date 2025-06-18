@@ -1,6 +1,8 @@
 import { User } from '../context/AuthContext';
 
-const API_URL = 'http://localhost:5000/api';
+export const BASE_URL = 'https://school-management-system-1z9i.onrender.com'
+
+const API_URL = `${BASE_URL}/api`;
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {

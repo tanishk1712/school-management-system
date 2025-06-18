@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Calendar, DollarSign, Users, AlertCircle, Download, FileText, MessageSquare } from 'lucide-react';
 import Nodata from './Nodata';
+import { BASE_URL } from '../../services/authService';
 
 type FeeStatus = 'PENDING' | 'PAID' | 'OVERDUE';
 type FeeType = 'TUITION' | 'TRANSPORT' | 'LIBRARY' | 'LABORATORY' | 'SPORTS' | 'OTHER';
@@ -66,7 +67,7 @@ const SchoolFeeManagement: React.FC = () => {
 
         const fetchStudents = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/students', {
+                const response = await fetch(`${BASE_URL}/api/students`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -88,7 +89,7 @@ const SchoolFeeManagement: React.FC = () => {
 
         const fetchFees = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/fees', {
+                const response = await fetch(`${BASE_URL}/api/fees`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

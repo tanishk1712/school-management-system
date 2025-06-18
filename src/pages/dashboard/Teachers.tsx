@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Nodata from './Nodata';
+import { BASE_URL } from '../../services/authService';
 
 
 // Type for teacher
@@ -56,7 +57,7 @@ const Teachers = () => {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/teachers', {
+        const response = await fetch(`${BASE_URL}/api/teachers`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -143,7 +144,7 @@ const Teachers = () => {
           joinDate: form.joinDate || new Date().toISOString().split('T')[0],
         };
       
-        const response = await fetch(`http://localhost:5000/api/teachers/${editingTeacher.id}`, {
+        const response = await fetch(`${BASE_URL}/api/teachers/${editingTeacher.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ const Teachers = () => {
           createdAt: new Date().toISOString(),
         };
   
-        const response = await fetch('http://localhost:5000/api/teachers', {
+        const response = await fetch(`${BASE_URL}/api/teachers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -204,7 +205,7 @@ const Teachers = () => {
   // Delete teacher
   const deleteTeacher = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/teachers/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/teachers/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

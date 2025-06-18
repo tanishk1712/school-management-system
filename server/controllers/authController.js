@@ -19,7 +19,7 @@ export const registerSchool = async (req, res) => {
     }
 
     // Check if school exists
-    const schoolExists = await School.findOne({ 
+    const schoolExists = await School.findOne({
       $or: [
         { schoolName },
         { schoolEmail }
@@ -49,7 +49,7 @@ export const registerSchool = async (req, res) => {
 
     if (school) {
       const token = generateToken(school._id);
-      
+
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -97,7 +97,8 @@ export const loginSchool = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      sameSite: 'None',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
     res.json({

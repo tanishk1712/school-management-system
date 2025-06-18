@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Nodata from './Nodata';
+import { BASE_URL } from '../../services/authService';
 
 
 // Available classes and sections
@@ -72,7 +73,7 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/students', {
+        const response = await fetch(`${BASE_URL}/api/students`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -179,7 +180,7 @@ const Students = () => {
         const studentId = editingStudent._id || editingStudent.id;
 
         // Update existing student
-        const response = await fetch(`http://localhost:5000/api/students/${studentId}`, {
+        const response = await fetch(`${BASE_URL}/api/students/${studentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -209,7 +210,7 @@ const Students = () => {
         toast.success('Student updated successfully');
       } else {
         // Add new student
-        const response = await fetch('http://localhost:5000/api/students', {
+        const response = await fetch(`${BASE_URL}/api/students`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -238,7 +239,7 @@ const Students = () => {
   // Delete student
   const deleteStudent = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/students/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/students/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
