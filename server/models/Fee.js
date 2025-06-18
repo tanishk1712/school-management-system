@@ -18,7 +18,7 @@ const feeSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['TUITION', 'EXAM', 'TRANSPORT', 'LIBRARY', 'OTHER']
+    enum: ['TUITION', 'TRANSPORT', 'LIBRARY', 'LABORATORY', 'SPORTS', 'OTHER']
   },
   month: {
     type: String,

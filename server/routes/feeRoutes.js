@@ -11,46 +11,6 @@ import Fee from '../models/Fee.js';
 
 const router = express.Router();
 
-// router.use(protect);
-
-// router.route('/')
-//   .get(getFees)
-//   .post(createFee);
-
-// router.route('/:id')
-//   .put(updateFeeStatus)
-//   .delete(deleteFee);
-
-// export const createFee = async (req, res) => {
-//   try {
-//     const {
-//       studentId,
-//       amount,
-//       type,
-//       month,
-//       year,
-//       dueDate,
-//       description
-//     } = req.body;
-
-//     const newFee = await Fee.create({
-//       schoolId: req.user._id,
-//       studentId,
-//       amount,
-//       type,
-//       month,
-//       year,
-//       dueDate,
-//       description
-//     });
-
-//     res.status(201).json(newFee);
-//   } catch (error) {
-//     console.error('Create fee error:', error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// };
-
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const schoolId = req.user.id;
@@ -61,11 +21,11 @@ router.post('/', authenticateToken, async (req, res) => {
       month,
       year,
       dueDate,
-      description
+      description,
+      status
     } = req.body;
 
-    // Validate input
-    if (!amount || !type || !month || !year || !dueDate || !description) {
+    if (!amount || !type || !month || !year || !dueDate || !description || !status) {
       return res.status(400).json({ message: 'Required fields are missing' });
     }
 
@@ -77,7 +37,8 @@ router.post('/', authenticateToken, async (req, res) => {
       month,
       year,
       dueDate,
-      description
+      description,
+      status
     });
 
     const savedFee = await newFee.save();
@@ -98,6 +59,32 @@ router.get('/', authenticateToken, async (req, res) => {
     res.json(fees);
   } catch (error) {
     console.error('Get fees error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.put('/status/:id', authenticateToken, async (req, res) => {
+  try {
+    const feeId = req.params.id;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+
+    const updatedFee = await Fee.findByIdAndUpdate(
+      feeId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedFee) {
+      return res.status(404).json({ message: 'Fee not found' });
+    }
+
+    res.json(updatedFee);
+  } catch (error) {
+    console.error('Update fee status error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

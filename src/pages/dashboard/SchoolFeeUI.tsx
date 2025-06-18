@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Calendar, DollarSign, Users, AlertCircle, Download, FileText, MessageSquare } from 'lucide-react';
@@ -45,7 +46,6 @@ const SchoolFeeManagement: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // New fee form state
     const [newFee, setNewFee] = useState({
         studentId: '',
         amount: '',
@@ -61,7 +61,6 @@ const SchoolFeeManagement: React.FC = () => {
     console.log(fees, 'jaikrishnaaaa')
 
 
-    // Mock data for demonstration
     useEffect(() => {
 
         const fetchStudents = async () => {
@@ -114,11 +113,36 @@ const SchoolFeeManagement: React.FC = () => {
     }, [schoolID]);
 
     const filteredFees = fees.filter(fee => {
-        const matchesSearch = fee.studentId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            fee.studentId.rollNumber.includes(searchTerm);
-        const matchesStatus = statusFilter === 'ALL' || fee.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        try {
+            if (!fee || typeof fee !== 'object') {
+                return false;
+            }
+
+            if (!fee.studentId || typeof fee.studentId !== 'object') {
+                return false;
+            }
+
+            const studentName = String(fee.studentId.name || '');
+            const studentRollNumber = String(fee.studentId.rollNumber || '');
+
+            if (!searchTerm || searchTerm.trim() === '') {
+                return statusFilter === 'ALL' || fee.status === statusFilter;
+            }
+
+            const searchLower = searchTerm.toLowerCase().trim();
+            const matchesSearch =
+                studentName.toLowerCase().includes(searchLower) ||
+                studentRollNumber.toLowerCase().includes(searchLower);
+
+            const matchesStatus = statusFilter === 'ALL' || fee.status === statusFilter;
+
+            return matchesSearch && matchesStatus;
+        } catch (error) {
+            console.error('Error filtering fee:', error, fee);
+            return false;
+        }
     });
+
 
     const totalCollected = fees.filter(f => f.status === 'PAID').reduce((sum, f) => sum + f.amount, 0);
     const totalPending = fees.filter(f => f.status === 'PENDING').reduce((sum, f) => sum + f.amount, 0);
@@ -126,38 +150,68 @@ const SchoolFeeManagement: React.FC = () => {
 
     const handleCreateFee = async () => {
         try {
-            // In real app, this would be an API call
             const selectedStudent = students.find(s => s._id === newFee.studentId);
-            if (!selectedStudent) return;
+            if (!selectedStudent) {
+                setError('Please select a valid student');
+                return;
+            }
 
-            const feeData: Fee = {
-                _id: Date.now().toString(),
+            const amount = parseFloat(newFee.amount);
+            if (isNaN(amount) || amount <= 0) {
+                setError('Please enter a valid amount');
+                return;
+            }
+
+            const feeData = {
                 studentId: selectedStudent,
-                amount: parseFloat(newFee.amount),
+                amount: amount,
                 type: newFee.type,
                 month: newFee.month,
                 year: newFee.year,
                 dueDate: newFee.dueDate,
                 description: newFee.description,
-                status: 'PENDING',
+                status: 'PENDING' as FeeStatus,
                 createdAt: new Date().toISOString()
             };
 
-            setFees([feeData, ...fees]);
-            setShowAddModal(false);
-            setNewFee({
-                studentId: '',
-                amount: '',
-                type: 'TUITION',
-                month: '',
-                year: new Date().getFullYear(),
-                dueDate: '',
-                description: ''
+            const response = await fetch('http://localhost:5000/api/fees', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`
+                },
+                body: JSON.stringify(feeData),
+                credentials: 'include',
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to create fee record');
+            }
+
+            const savedFee = await response.json();
+
+            if (savedFee && savedFee.studentId) {
+                setFees(prevFees => [savedFee, ...prevFees]);
+                setShowAddModal(false);
+                setNewFee({
+                    studentId: '',
+                    amount: '',
+                    type: 'TUITION',
+                    month: '',
+                    year: new Date().getFullYear(),
+                    dueDate: '',
+                    description: ''
+                });
+                setError('');
+            } else {
+                throw new Error('Invalid response structure from server');
+            }
         } catch (error) {
+            console.error('Error creating fee:', error);
             setError('Failed to create fee record');
         }
     };
+
 
     const handleUpdateStatus = async (feeId: string, status: FeeStatus) => {
         try {
@@ -181,8 +235,39 @@ const SchoolFeeManagement: React.FC = () => {
         }
     };
 
+    const statusOnchange = async (e: React.ChangeEvent<HTMLSelectElement>, fee: Fee) => {
+        const newStatus = e.target.value as FeeStatus;
+
+        try {
+            const res = await fetch(`http://localhost:5000/api/fees/status/${fee._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${schoolID}`
+                },
+                body: JSON.stringify({ status: newStatus }),
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                console.error('Failed to update status:', error.message);
+                return;
+            }
+
+            const updatedFee = await res.json();
+            console.log('Status updated:', updatedFee);
+
+            // Optionally update UI state here
+            // e.g. refresh fee list or update local state
+
+        } catch (error) {
+            console.error('Error updating fee status:', error);
+        }
+    };
+
+
     const generatePDF = (fee: Fee) => {
-        // Create PDF content
         const pdfContent = `
       <!DOCTYPE html>
       <html>
@@ -288,7 +373,6 @@ const SchoolFeeManagement: React.FC = () => {
       </html>
     `;
 
-        // Create a new window and print
         const printWindow = window.open('', '_blank');
         if (printWindow) {
             printWindow.document.write(pdfContent);
@@ -499,9 +583,9 @@ Bright Future School`;
 
                 {/* Fee Table */}
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-auto max-h-[39rem]">
                         <table className="w-full">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 static">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
@@ -512,7 +596,7 @@ Bright Future School`;
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white divide-y divide-gray-200 ">
                                 {!loading && filteredFees.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
@@ -537,13 +621,14 @@ Bright Future School`;
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <select
                                                     value={fee.status}
-                                                    onChange={(e) => handleUpdateStatus(fee._id, e.target.value as FeeStatus)}
+                                                    onChange={(e) => statusOnchange(e, fee)}
                                                     className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(fee.status)}`}
                                                 >
                                                     <option value="PENDING">Pending</option>
                                                     <option value="PAID">Paid</option>
                                                     <option value="OVERDUE">Overdue</option>
                                                 </select>
+
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center gap-2">
