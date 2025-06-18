@@ -2,7 +2,6 @@ import { User } from '../context/AuthContext';
 
 const API_URL = 'http://localhost:5000/api';
 
-// Helper function to handle API responses
 const handleResponse = async (response: Response) => {
   const contentType = response.headers.get('content-type');
 

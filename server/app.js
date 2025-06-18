@@ -45,6 +45,9 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Something went wrong!' });
 });
+app.get('/', (req, res) => {
+    res.send('Welcome to the School Management System API');
+});
 
 // 404 handler - This should be the last middleware
 app.use((req, res) => {
