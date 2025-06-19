@@ -59,6 +59,7 @@ router.post('/register', async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
+            sameSite: "None",
             maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
@@ -77,20 +78,17 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { schoolName, password } = req.body;
-
-        // Validate input
+        t
         if (!schoolName || !password) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        // Find school
         const school = await School.findOne({ schoolName });
 
         if (!school) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Verify password
         const isMatch = await bcrypt.compare(password, school.password);
 
         if (!isMatch) {
@@ -104,11 +102,11 @@ router.post('/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
+            sameSite: "None",
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         // Send response without password
