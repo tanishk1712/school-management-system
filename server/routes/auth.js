@@ -78,7 +78,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { schoolName, password } = req.body;
-        t
+
         if (!schoolName || !password) {
             return res.status(400).json({ message: 'All fields are required' });
         }
