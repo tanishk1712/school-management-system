@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Calendar, DollarSign, Users, AlertCircle, Download, FileText, MessageSquare } from 'lucide-react';
 import Nodata from './Nodata';
 import { BASE_URL } from '../../services/authService';
+import Loader from './Loader';
 
 type FeeStatus = 'PENDING' | 'PAID' | 'OVERDUE';
 type FeeType = 'TUITION' | 'TRANSPORT' | 'LIBRARY' | 'LABORATORY' | 'SPORTS' | 'OTHER';
@@ -43,10 +44,10 @@ const SchoolFeeManagement: React.FC = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showMessageModal, setShowMessageModal] = useState(false);
     const [selectedFee, setSelectedFee] = useState<Fee | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    // New fee form state
     const [newFee, setNewFee] = useState({
         studentId: '',
         amount: '',
@@ -57,66 +58,82 @@ const SchoolFeeManagement: React.FC = () => {
         description: ''
     });
 
-    const schoolID = localStorage.getItem("School ID")
+    const schoolID = localStorage.getItem("School ID");
 
-    console.log(fees, 'jaikrishnaaaa')
+    const fetchStudents = useCallback(async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/students`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`,
+                },
+                credentials: 'include',
+            });
 
-
-    // Mock data for demonstration
-    useEffect(() => {
-
-        const fetchStudents = async () => {
-            try {
-                const response = await fetch(`${BASE_URL}/api/students`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${schoolID}`,
-                    },
-                    credentials: 'include',
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch students');
-                }
-
-                const data = await response.json();
-                setStudents(data);
-            } catch (error) {
-                console.error('Error fetching students:', error);
+            if (!response.ok) {
+                throw new Error('Failed to fetch students');
             }
-        };
 
-        const fetchFees = async () => {
-            try {
-                const response = await fetch(`${BASE_URL}/api/fees`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${schoolID}`,
-                    },
-                    credentials: 'include',
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch Fees');
-                }
-
-                const data = await response.json();
-                console.log(data, 'uiouio')
-                setFees(data);
-            } catch (error) {
-                console.error('Error fetching fees:', error);
-            }
-        };
-        fetchStudents();
-        fetchFees();
-        setLoading(false);
+            const data = await response.json();
+            setStudents(data);
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            setError('Failed to fetch students');
+        }
     }, [schoolID]);
 
+    const fetchFees = useCallback(async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/fees`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`,
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch fees');
+            }
+
+            const data = await response.json();
+            setFees(data);
+        } catch (error) {
+            console.error('Error fetching fees:', error);
+            setError('Failed to fetch fees');
+        }
+    }, [schoolID]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            if (!schoolID) {
+                setError('School ID not found');
+                return;
+            }
+
+            setIsLoading(true);
+            setError('');
+
+            try {
+                await Promise.all([fetchStudents(), fetchFees()]);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                setError('Failed to load data');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, [schoolID, fetchStudents, fetchFees]);
+
     const filteredFees = fees.filter(fee => {
-        const matchesSearch = fee.studentId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            fee.studentId.rollNumber.includes(searchTerm);
+        if (!fee.studentId) return false;
+
+        const matchesSearch = fee.studentId.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            fee.studentId.rollNumber?.includes(searchTerm);
         const matchesStatus = statusFilter === 'ALL' || fee.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -125,60 +142,116 @@ const SchoolFeeManagement: React.FC = () => {
     const totalPending = fees.filter(f => f.status === 'PENDING').reduce((sum, f) => sum + f.amount, 0);
     const totalOverdue = fees.filter(f => f.status === 'OVERDUE').reduce((sum, f) => sum + f.amount, 0);
 
+    const resetForm = () => {
+        setNewFee({
+            studentId: '',
+            amount: '',
+            type: 'TUITION',
+            month: '',
+            year: new Date().getFullYear(),
+            dueDate: '',
+            description: ''
+        });
+    };
+
     const handleCreateFee = async () => {
+        if (!newFee.studentId || !newFee.amount || !newFee.month || !newFee.dueDate) {
+            setError('Please fill in all required fields');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError('');
+
         try {
-            // In real app, this would be an API call
-            const selectedStudent = students.find(s => s._id === newFee.studentId);
-            if (!selectedStudent) return;
-
-            const feeData: Fee = {
-                _id: Date.now().toString(),
-                studentId: selectedStudent,
-                amount: parseFloat(newFee.amount),
-                type: newFee.type,
-                month: newFee.month,
-                year: newFee.year,
-                dueDate: newFee.dueDate,
-                description: newFee.description,
-                status: 'PENDING',
-                createdAt: new Date().toISOString()
-            };
-
-            setFees([feeData, ...fees]);
-            setShowAddModal(false);
-            setNewFee({
-                studentId: '',
-                amount: '',
-                type: 'TUITION',
-                month: '',
-                year: new Date().getFullYear(),
-                dueDate: '',
-                description: ''
+            const response = await fetch(`${BASE_URL}/api/fees`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`,
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    studentId: newFee.studentId,
+                    amount: parseFloat(newFee.amount),
+                    type: newFee.type,
+                    month: newFee.month,
+                    year: newFee.year,
+                    dueDate: newFee.dueDate,
+                    description: newFee.description,
+                }),
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to create fee record');
+            }
+
+            setShowAddModal(false);
+            resetForm();
+
+            await fetchFees();
+
         } catch (error) {
+            console.error('Error creating fee:', error);
             setError('Failed to create fee record');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleUpdateStatus = async (feeId: string, status: FeeStatus) => {
         try {
-            setFees(fees.map(fee =>
-                fee._id === feeId
-                    ? { ...fee, status, paidDate: status === 'PAID' ? new Date().toISOString() : undefined }
-                    : fee
-            ));
+            const response = await fetch(`${BASE_URL}/api/fees/${feeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`,
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    status,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update fee status');
+            }
+
+            // Refresh fees data
+            await fetchFees();
+
         } catch (error) {
+            console.error('Error updating fee status:', error);
             setError('Failed to update fee status');
         }
     };
 
+    // Handle delete fee with API call
     const handleDeleteFee = async (feeId: string) => {
-        if (window.confirm('Are you sure you want to delete this fee record?')) {
-            try {
-                setFees(fees.filter(fee => fee._id !== feeId));
-            } catch (error) {
-                setError('Failed to delete fee record');
+        if (!window.confirm('Are you sure you want to delete this fee record?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/fees/${feeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${schoolID}`,
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete fee record');
             }
+
+            // Refresh fees data
+            await fetchFees();
+
+        } catch (error) {
+            console.error('Error deleting fee:', error);
+            setError('Failed to delete fee record');
         }
     };
 
@@ -300,7 +373,7 @@ const SchoolFeeManagement: React.FC = () => {
     };
 
     const generateMessage = (fee: Fee): string => {
-        const studentName = fee.studentId.name;
+        const studentName = fee.studentId?.name || 'Student';
         const amount = fee.amount.toLocaleString();
         const dueDate = new Date(fee.dueDate).toLocaleDateString();
         const period = `${fee.month} ${fee.year}`;
@@ -312,7 +385,7 @@ const SchoolFeeManagement: React.FC = () => {
 We acknowledge the receipt of fee payment for ${studentName}.
 
 Payment Details:
-- Student: ${studentName} (${fee.studentId.class}-${fee.studentId.section})
+- Student: ${studentName} (${fee.studentId?.class}-${fee.studentId?.section})
 - Fee Type: ${fee.type}
 - Amount: ₹${amount}
 - Period: ${period}
@@ -330,7 +403,7 @@ Contact: +91-XXXXXXXXXX`;
 This is a gentle reminder regarding the pending fee payment for ${studentName}.
 
 Payment Details:
-- Student: ${studentName} (${fee.studentId.class}-${fee.studentId.section})
+- Student: ${studentName} (${fee.studentId?.class}-${fee.studentId?.section})
 - Fee Type: ${fee.type}
 - Amount: ₹${amount}
 - Period: ${period}
@@ -350,7 +423,7 @@ Contact: +91-XXXXXXXXXX`;
 URGENT: Fee payment is overdue for ${studentName}.
 
 Payment Details:
-- Student: ${studentName} (${fee.studentId.class}-${fee.studentId.section})
+- Student: ${studentName} (${fee.studentId?.class}-${fee.studentId?.section})
 - Fee Type: ${fee.type}
 - Amount: ₹${amount}
 - Period: ${period}
@@ -370,7 +443,7 @@ Contact: +91-XXXXXXXXXX`;
 Fee notification for ${studentName}.
 
 Payment Details:
-- Student: ${studentName} (${fee.studentId.class}-${fee.studentId.section})
+- Student: ${studentName} (${fee.studentId?.class}-${fee.studentId?.section})
 - Fee Type: ${fee.type}
 - Amount: ₹${amount}
 - Period: ${period}
@@ -402,18 +475,16 @@ Bright Future School`;
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(''), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className=" mx-auto space-y-6">
-                {/* Header */}
+            <div className="mx-auto space-y-6">
                 <div className="">
                     <div className="flex justify-between items-center flex-wrap gap-4">
                         <div>
@@ -422,7 +493,8 @@ Bright Future School`;
                         </div>
                         <button
                             onClick={() => setShowAddModal(true)}
-                            className="border p-3 rounded-lg text-[#152259] hover:bg-[#152259] hover:text-gray-200"
+                            className="border p-3 rounded-lg text-[#152259] hover:bg-[#152259] hover:text-gray-200 disabled:opacity-50"
+                            disabled={isLoading}
                         >
                             Add Fee
                         </button>
@@ -481,6 +553,7 @@ Bright Future School`;
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="focus:ring-primary-500 focus:border-primary-500 w-full sm:text-sm border-gray-300 rounded-md outline-none"
+                                disabled={isLoading}
                             />
                         </div>
                         <div className='font-medium text-gray-500 text-[18px] rounded-md shadow-sm flex justify-start bg-white max-w-lg min-w-fit gap-2 p-2'>
@@ -488,6 +561,7 @@ Bright Future School`;
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value as FeeStatus | 'ALL')}
                                 className="focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm bg-white outline-none"
+                                disabled={isLoading}
                             >
                                 <option value="ALL">All Status</option>
                                 <option value="PAID">Paid</option>
@@ -514,7 +588,13 @@ Bright Future School`;
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {!loading && filteredFees.length === 0 ? (
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={7} className="text-center py-40 px-6">
+                                            <Loader />
+                                        </td>
+                                    </tr>
+                                ) : filteredFees.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                                             <Nodata name="Student's fees" />
@@ -525,8 +605,8 @@ Bright Future School`;
                                         <tr key={fee._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div>
-                                                    <div className="text-sm font-medium text-gray-900">{fee.studentId.name}</div>
-                                                    <div className="text-sm text-gray-500">{fee.studentId.class} - {fee.studentId.section} | Roll: {fee.studentId.rollNumber}</div>
+                                                    <div className="text-sm font-medium text-gray-900">{fee.studentId?.name || 'N/A'}</div>
+                                                    <div className="text-sm text-gray-500">{fee.studentId?.class} - {fee.studentId?.section} | Roll: {fee.studentId?.rollNumber}</div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fee.type}</td>
@@ -540,6 +620,7 @@ Bright Future School`;
                                                     value={fee.status}
                                                     onChange={(e) => handleUpdateStatus(fee._id, e.target.value as FeeStatus)}
                                                     className={`text-xs font-medium px-2 py-1 rounded-full border ${getStatusColor(fee.status)}`}
+                                                    disabled={isLoading}
                                                 >
                                                     <option value="PENDING">Pending</option>
                                                     <option value="PAID">Paid</option>
@@ -566,6 +647,7 @@ Bright Future School`;
                                                         onClick={() => handleDeleteFee(fee._id)}
                                                         className="text-red-600 hover:text-red-900 transition-colors"
                                                         title="Delete Fee"
+                                                        disabled={isLoading}
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -585,11 +667,12 @@ Bright Future School`;
                             <h2 className="text-xl font-bold mb-4">Add New Fee</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Student *</label>
                                     <select
                                         value={newFee.studentId}
                                         onChange={(e) => setNewFee({ ...newFee, studentId: e.target.value })}
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        disabled={isSubmitting}
                                     >
                                         <option value="">Select Student</option>
                                         {students.map(student => (
@@ -606,6 +689,7 @@ Bright Future School`;
                                         value={newFee.type}
                                         onChange={(e) => setNewFee({ ...newFee, type: e.target.value as FeeType })}
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        disabled={isSubmitting}
                                     >
                                         <option value="TUITION">Tuition</option>
                                         <option value="TRANSPORT">Transport</option>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Edit2, 
-  Trash2, 
-  X, 
+import {
+  Search,
+  Edit2,
+  Trash2,
+  X,
   Check,
   ClipboardList,
   Calendar,
@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast';
 import { format, parseISO } from 'date-fns';
 import Nodata from './Nodata'
 import { BASE_URL } from '../../services/authService';
+import Loader from './Loader';
 
 // Type for exam
 interface Exam {
@@ -45,14 +46,14 @@ interface ExamForm {
 const availableClasses = ['8', '9', '10', '11', '12'];
 const availableSections = ['A', 'B', 'C', 'D'];
 const availableSubjects = [
-  'Mathematics', 
-  'Science', 
-  'English', 
-  'History', 
-  'Geography', 
-  'Physics', 
-  'Chemistry', 
-  'Biology', 
+  'Mathematics',
+  'Science',
+  'English',
+  'History',
+  'Geography',
+  'Physics',
+  'Chemistry',
+  'Biology',
   'Computer Science'
 ];
 
@@ -116,9 +117,9 @@ const Exams = () => {
 
   // Filter exams based on search term and filters
   const filteredExams = exams.filter(
-    exam => 
+    exam =>
       (exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       exam.subject.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        exam.subject.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (filterClass === '' || exam.class === filterClass) &&
       (filterSubject === '' || exam.subject === filterSubject)
   );
@@ -154,9 +155,9 @@ const Exams = () => {
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ 
-      ...prev, 
-      [name]: name === 'totalMarks' ? parseInt(value) : value 
+    setForm(prev => ({
+      ...prev,
+      [name]: name === 'totalMarks' ? parseInt(value) : value
     }));
   };
 
@@ -168,7 +169,7 @@ const Exams = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!form.name || !form.subject || !form.class || !form.section || !form.date || !form.startTime || !form.endTime) {
       toast.error('Please fill all required fields');
       return;
@@ -176,7 +177,7 @@ const Exams = () => {
 
     try {
       setIsLoading(true);
-      
+
       const examData = {
         name: form.name,
         subject: form.subject,
@@ -206,14 +207,14 @@ const Exams = () => {
         }
 
         const updatedExam = await response.json();
-        
+
         // Update exams state with updated exam
-        setExams(exams.map(e => 
-          (e.id === examId || e._id === examId || e.examID === examId) 
-            ? { ...e, ...updatedExam } 
+        setExams(exams.map(e =>
+          (e.id === examId || e._id === examId || e.examID === examId)
+            ? { ...e, ...updatedExam }
             : e
         ));
-        
+
         toast.success('Exam updated successfully');
       } else {
         // Add new exam
@@ -226,11 +227,11 @@ const Exams = () => {
           credentials: 'include',
           body: JSON.stringify(examData),
         });
-    
+
         if (!response.ok) {
           throw new Error('Failed to add exam');
         }
-    
+
         const savedExam = await response.json();
         setExams([...exams, savedExam]);
         toast.success('Exam added successfully');
@@ -291,7 +292,7 @@ const Exams = () => {
 
   return (
     <div className="animate-fade-in">
-      
+
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="font-medium text-gray-500 text-[25px]">Exams</h1>
@@ -364,17 +365,6 @@ const Exams = () => {
         </div>
         <div className='font-medium text-gray-500 text-[18px]'>Total exams - {exams?.length}</div>
       </div>
-
-      {/* Loading indicator */}
-      {isLoading && (
-        <div className="flex justify-center my-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500 mx-auto"></div>
-            <p className="mt-2 text-gray-500">Loading...</p>
-          </div>
-        </div>
-      )}
-
       {/* Exams List */}
       <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
@@ -398,9 +388,15 @@ const Exams = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {!isLoading && filteredExams.length === 0 ? (
+            {isLoading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={5} className="text-center py-40 px-6">
+                  <Loader />
+                </td>
+              </tr>
+            ) : filteredExams.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-6 text-gray-500">
                   <Nodata name="Exams" />
                 </td>
               </tr>
@@ -513,7 +509,7 @@ const Exams = () => {
                             required
                           />
                         </div>
-                        
+
                         {/* Subject */}
                         <div>
                           <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
@@ -532,7 +528,7 @@ const Exams = () => {
                             ))}
                           </select>
                         </div>
-                        
+
                         {/* Class and Section */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
@@ -570,7 +566,7 @@ const Exams = () => {
                             </select>
                           </div>
                         </div>
-                        
+
                         {/* Date */}
                         <div>
                           <label htmlFor="date" className="block text-sm font-medium text-gray-700">
@@ -586,7 +582,7 @@ const Exams = () => {
                             required
                           />
                         </div>
-                        
+
                         {/* Start and End Time */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
@@ -618,7 +614,7 @@ const Exams = () => {
                             />
                           </div>
                         </div>
-                        
+
                         {/* Total Marks */}
                         <div>
                           <label htmlFor="totalMarks" className="block text-sm font-medium text-gray-700">

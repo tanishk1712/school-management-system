@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Search,  
-  Edit2, 
-  Trash2, 
-  X, 
-  Check, 
+import {
+  Search,
+  Edit2,
+  Trash2,
+  X,
+  Check,
   Mail,
   Phone
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Nodata from './Nodata';
 import { BASE_URL } from '../../services/authService';
+import Loader from './Loader';
 
 
 // Type for teacher
 interface Teacher {
-  _id:string;
+  _id: string;
   id: string;
   name: string;
   email: string;
@@ -52,11 +53,13 @@ const Teachers = () => {
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [form, setForm] = useState<TeacherForm>(emptyForm);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const schoolID = localStorage.getItem("School ID")
 
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
+        setIsLoading(true)
         const response = await fetch(`${BASE_URL}/api/teachers`, {
           method: 'GET',
           headers: {
@@ -65,25 +68,27 @@ const Teachers = () => {
           },
           credentials: 'include',
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to fetch teachers');
         }
-  
+
         const data = await response.json();
         setTeachers(data);
       } catch (error) {
         console.error('Error fetching teachers:', error);
+      } finally {
+        setIsLoading(false)
       }
     };
-  
+
     fetchTeachers();
   }, [schoolID]);
-  
+
 
   // Filter teachers based on search term
   const filteredTeachers = teachers.filter(
-    teacher => 
+    teacher =>
       teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       teacher.subject.toLowerCase().includes(searchTerm.toLowerCase())
@@ -125,12 +130,12 @@ const Teachers = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!form.name || !form.email || !form.subject) {
       toast.error('Please fill all required fields');
       return;
     }
-  
+
     try {
       if (editingTeacher) {
         // Update existing teacher via PUT request
@@ -143,7 +148,7 @@ const Teachers = () => {
           qualification: form.qualification || '',
           joinDate: form.joinDate || new Date().toISOString().split('T')[0],
         };
-      
+
         const response = await fetch(`${BASE_URL}/api/teachers/${editingTeacher.id}`, {
           method: 'PUT',
           headers: {
@@ -154,11 +159,11 @@ const Teachers = () => {
           credentials: 'include',
         });
 
-      
+
         if (!response.ok) {
           throw new Error('Failed to update teacher');
         }
-      
+
         const savedTeacher = await response.json();
         setTeachers(teachers.map(t => t.id === savedTeacher.id ? savedTeacher : t));
         toast.success('Teacher updated successfully');
@@ -175,7 +180,7 @@ const Teachers = () => {
           joinDate: form.joinDate || new Date().toISOString().split('T')[0],
           createdAt: new Date().toISOString(),
         };
-  
+
         const response = await fetch(`${BASE_URL}/api/teachers`, {
           method: 'POST',
           headers: {
@@ -184,23 +189,23 @@ const Teachers = () => {
           credentials: 'include',
           body: JSON.stringify(newTeacher),
         });
-  
+
         if (!response.ok) {
           throw new Error('Failed to add teacher');
         }
-  
+
         const savedTeacher = await response.json();
         setTeachers([...teachers, savedTeacher]);
         toast.success('Teacher added successfully');
       }
-  
+
       closeModal();
     } catch (error) {
       console.error(error);
       toast.error('An error occurred. Please try again.');
     }
   };
-  
+
 
   // Delete teacher
   const deleteTeacher = async (id: string) => {
@@ -213,11 +218,11 @@ const Teachers = () => {
         },
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to delete teacher');
       }
-  
+
       // Update local state after successful deletion
       setTeachers(teachers.filter(t => t.id !== id));
       setDeleteConfirmId(null);
@@ -227,7 +232,7 @@ const Teachers = () => {
       toast.error('Failed to delete teacher');
     }
   };
-  
+
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -269,7 +274,7 @@ const Teachers = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div> 
+        </div>
         <div className='font-medium text-gray-500 text-[18px]'>Total teachers - {teachers?.length}</div>
       </div>
 
@@ -298,11 +303,17 @@ const Teachers = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredTeachers.length === 0 ? (
+          <tbody className="bg-white divide-y divide-gray-200 max-h-96">
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-40 px-6">
+                  <Loader />
+                </td>
+              </tr>
+            ) : filteredTeachers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                <Nodata name="Teachers" />
+                  <Nodata name="Teachers" />
 
                 </td>
               </tr>
@@ -412,7 +423,7 @@ const Teachers = () => {
                             required
                           />
                         </div>
-                        
+
                         {/* Email */}
                         <div>
                           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -428,7 +439,7 @@ const Teachers = () => {
                             required
                           />
                         </div>
-                        
+
                         {/* Phone */}
                         <div>
                           <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
@@ -443,7 +454,7 @@ const Teachers = () => {
                             className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           />
                         </div>
-                        
+
                         {/* Subject */}
                         <div>
                           <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
@@ -459,7 +470,7 @@ const Teachers = () => {
                             required
                           />
                         </div>
-                        
+
                         {/* Qualification */}
                         <div>
                           <label htmlFor="qualification" className="block text-sm font-medium text-gray-700">
@@ -474,7 +485,7 @@ const Teachers = () => {
                             className="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           />
                         </div>
-                        
+
                         {/* Join Date */}
                         <div>
                           <label htmlFor="joinDate" className="block text-sm font-medium text-gray-700">

@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-hot-toast';
 import Nodata from './Nodata';
 import { BASE_URL } from '../../services/authService';
+import Loader from './Loader';
 
 
 // Available classes and sections
@@ -68,11 +69,13 @@ const Students = () => {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [form, setForm] = useState<StudentForm>(emptyForm);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const schoolID = localStorage.getItem("School ID")
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(`${BASE_URL}/api/students`, {
           method: 'GET',
           headers: {
@@ -90,6 +93,8 @@ const Students = () => {
         setStudents(data);
       } catch (error) {
         console.error('Error fetching students:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -382,10 +387,16 @@ const Students = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredStudents.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-40 px-6">
+                  <Loader />
+                </td>
+              </tr>
+            ) : filteredStudents.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                <Nodata name="Students" />
+                  <Nodata name="Students" />
 
                 </td>
               </tr>

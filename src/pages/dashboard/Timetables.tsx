@@ -14,6 +14,7 @@ import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import Nodata from './Nodata';
 import { BASE_URL } from '../../services/authService';
+import Loader from './Loader';
 
 // Available classes and sections
 const availableClasses = ['8', '9', '10', '11', '12'];
@@ -129,11 +130,13 @@ const Timetables = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [newEntry, setNewEntry] = useState<Partial<TimetableEntry>>({ day: 'Monday', slotId: '1', subject: '', teacher: '' });
   const [teachersName, setTeacherName] = useState<Teacher[]>([])
+  const [isLoading, setLoading] = useState(false);
   const schoolID = localStorage.getItem("School ID")
 
   useEffect(() => {
     const fetchTimetable = async () => {
       try {
+        setLoading(true)
         const response = await fetch(`${BASE_URL}/api/timetables`, {
           method: 'GET',
           headers: {
@@ -151,6 +154,8 @@ const Timetables = () => {
         setTimetables(data);
       } catch (error) {
         console.error('Error fetching time table:', error);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -609,7 +614,13 @@ const Timetables = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredTimetables.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-40 px-6">
+                  <Loader />
+                </td>
+              </tr>
+            ) : filteredTimetables.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
                   <Nodata name='Time Table' />

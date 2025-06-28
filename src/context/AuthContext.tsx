@@ -5,6 +5,7 @@ import { apiLogin, apiRegister, apiLogout, apiCheckAuth } from '../services/auth
 export interface User {
   id: string;
   adminName: string;
+  createdAt: string;
   schoolName: string;
   schoolEmail: string;
 }
