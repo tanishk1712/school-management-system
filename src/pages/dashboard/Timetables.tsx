@@ -50,33 +50,33 @@ const timeSlots = [
 ];
 
 // Mock timetable detail data
-const mockTimetableDetails = {
-  '1': [
-    { day: 'Monday', slotId: '1', subject: 'Mathematics', teacher: 'Sarah Johnson' },
-    { day: 'Monday', slotId: '2', subject: 'English', teacher: 'Emily Chen' },
-    { day: 'Monday', slotId: '3', subject: 'Physics', teacher: 'Michael Rodriguez' },
-    { day: 'Monday', slotId: '4', subject: 'History', teacher: 'David Wilson' },
-    { day: 'Tuesday', slotId: '1', subject: 'English', teacher: 'Emily Chen' },
-    { day: 'Tuesday', slotId: '2', subject: 'Chemistry', teacher: 'Michael Rodriguez' },
-    { day: 'Tuesday', slotId: '3', subject: 'Mathematics', teacher: 'Sarah Johnson' },
-    { day: 'Tuesday', slotId: '4', subject: 'Physical Education', teacher: 'Jessica Taylor' },
-    // Add more entries for other days and slots as needed
-  ],
-  '2': [
-    { day: 'Monday', slotId: '1', subject: 'Science', teacher: 'Michael Rodriguez' },
-    { day: 'Monday', slotId: '2', subject: 'Mathematics', teacher: 'Sarah Johnson' },
-    { day: 'Monday', slotId: '3', subject: 'English', teacher: 'Emily Chen' },
-    { day: 'Monday', slotId: '4', subject: 'History', teacher: 'David Wilson' },
-    // Add more entries for other days and slots as needed
-  ],
-  '3': [
-    { day: 'Monday', slotId: '1', subject: 'Physics', teacher: 'Michael Rodriguez' },
-    { day: 'Monday', slotId: '2', subject: 'Chemistry', teacher: 'Michael Rodriguez' },
-    { day: 'Monday', slotId: '3', subject: 'Mathematics', teacher: 'Sarah Johnson' },
-    { day: 'Monday', slotId: '4', subject: 'English', teacher: 'Emily Chen' },
-    // Add more entries for other days and slots as needed
-  ]
-};
+// const mockTimetableDetails = {
+//   '1': [
+//     { day: 'Monday', slotId: '1', subject: 'Mathematics', teacher: 'Sarah Johnson' },
+//     { day: 'Monday', slotId: '2', subject: 'English', teacher: 'Emily Chen' },
+//     { day: 'Monday', slotId: '3', subject: 'Physics', teacher: 'Michael Rodriguez' },
+//     { day: 'Monday', slotId: '4', subject: 'History', teacher: 'David Wilson' },
+//     { day: 'Tuesday', slotId: '1', subject: 'English', teacher: 'Emily Chen' },
+//     { day: 'Tuesday', slotId: '2', subject: 'Chemistry', teacher: 'Michael Rodriguez' },
+//     { day: 'Tuesday', slotId: '3', subject: 'Mathematics', teacher: 'Sarah Johnson' },
+//     { day: 'Tuesday', slotId: '4', subject: 'Physical Education', teacher: 'Jessica Taylor' },
+//     // Add more entries for other days and slots as needed
+//   ],
+//   '2': [
+//     { day: 'Monday', slotId: '1', subject: 'Science', teacher: 'Michael Rodriguez' },
+//     { day: 'Monday', slotId: '2', subject: 'Mathematics', teacher: 'Sarah Johnson' },
+//     { day: 'Monday', slotId: '3', subject: 'English', teacher: 'Emily Chen' },
+//     { day: 'Monday', slotId: '4', subject: 'History', teacher: 'David Wilson' },
+//     // Add more entries for other days and slots as needed
+//   ],
+//   '3': [
+//     { day: 'Monday', slotId: '1', subject: 'Physics', teacher: 'Michael Rodriguez' },
+//     { day: 'Monday', slotId: '2', subject: 'Chemistry', teacher: 'Michael Rodriguez' },
+//     { day: 'Monday', slotId: '3', subject: 'Mathematics', teacher: 'Sarah Johnson' },
+//     { day: 'Monday', slotId: '4', subject: 'English', teacher: 'Emily Chen' },
+//     // Add more entries for other days and slots as needed
+//   ]
+// };
 
 // Type definitions
 interface Timetable {
