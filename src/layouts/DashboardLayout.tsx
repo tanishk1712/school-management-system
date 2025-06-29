@@ -52,8 +52,8 @@ const DashboardLayout = () => {
         />
 
         {/* Sidebar */}
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-primary-800 pt-5 pb-4">
-          <div className="absolute top-0 right-0 -mr-12 pt-2">
+        <div className="relative flex-1 flex flex-col h-full w-full bg-primary-800 pt-5 pb-4">
+          <div className="absolute top-0 right-14 -mr-12 pt-2">
             <button
               type="button"
               className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"

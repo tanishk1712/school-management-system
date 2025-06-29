@@ -18,12 +18,12 @@ dotenv.config();
 const app = express();
 
 // Middleware
+
 app.use(cors({
-    origin: (origin, callback) => {
-        callback(null, origin); // Reflect the request origin
-    },
-    credentials: true
+    origin: process.env.FRONTEND_URL, // your frontend domain
+    credentials: true // 🔥 allows cookies to be sent
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
