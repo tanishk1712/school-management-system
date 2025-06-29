@@ -222,7 +222,7 @@ const Login = () => {
               </button>
               <Link
                 to="/register"
-                className="w-[45%] flex justify-center py-2 px-4 border border-[#152259] rounded-md shadow-sm text-sm font-medium text-[#152259] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-[45%] flex justify-center text-nowrap py-2 px-4 border border-[#152259] rounded-md shadow-sm text-sm font-medium text-[#152259] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Register your school
               </Link>
